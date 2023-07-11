@@ -2,8 +2,8 @@ package com.wei.project.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.wei.apicommon.common.ErrorCode;
 import com.wei.apicommon.model.entity.UserInterfaceInfo;
-import com.wei.project.common.ErrorCode;
 import com.wei.project.exception.BusinessException;
 import com.wei.project.mapper.UserInterfaceInfoMapper;
 import com.wei.project.service.UserInterfaceInfoService;

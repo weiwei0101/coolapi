@@ -4,8 +4,8 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.wei.apicommon.common.ErrorCode;
 import com.wei.apicommon.model.entity.User;
-import com.wei.project.common.ErrorCode;
 import com.wei.project.exception.BusinessException;
 import com.wei.project.mapper.UserMapper;
 import com.wei.project.service.UserService;
@@ -17,8 +17,8 @@ import org.springframework.util.DigestUtils;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
-import static com.wei.project.constant.UserConstant.ADMIN_ROLE;
-import static com.wei.project.constant.UserConstant.USER_LOGIN_STATE;
+import static com.wei.apicommon.constant.UserConstant.ADMIN_ROLE;
+import static com.wei.apicommon.constant.UserConstant.USER_LOGIN_STATE;
 
 
 /**

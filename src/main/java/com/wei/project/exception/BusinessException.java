@@ -1,6 +1,6 @@
 package com.wei.project.exception;
 
-import com.wei.project.common.ErrorCode;
+import com.wei.apicommon.common.ErrorCode;
 
 /**
  * 自定义异常类

@@ -1,8 +1,8 @@
 package com.wei.project.exception;
 
-import com.wei.project.common.BaseResponse;
-import com.wei.project.common.ErrorCode;
-import com.wei.project.common.ResultUtils;
+import com.wei.apicommon.common.BaseResponse;
+import com.wei.apicommon.common.ErrorCode;
+import com.wei.apicommon.common.ResultUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

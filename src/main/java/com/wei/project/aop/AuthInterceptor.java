@@ -1,9 +1,9 @@
 package com.wei.project.aop;
 
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.wei.apicommon.common.ErrorCode;
 import com.wei.apicommon.model.entity.User;
 import com.wei.project.annotation.AuthCheck;
-import com.wei.project.common.ErrorCode;
 import com.wei.project.exception.BusinessException;
 import com.wei.project.service.UserService;
 import org.apache.commons.lang3.StringUtils;

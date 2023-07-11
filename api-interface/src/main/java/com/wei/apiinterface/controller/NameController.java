@@ -1,8 +1,6 @@
 package com.wei.apiinterface.controller;
 
 import com.wei.apiclientsdk.model.User;
-import com.wei.apiclientsdk.util.SignUtil;
-import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 

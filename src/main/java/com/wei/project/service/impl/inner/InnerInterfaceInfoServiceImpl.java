@@ -1,9 +1,9 @@
 package com.wei.project.service.impl.inner;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.wei.apicommon.common.ErrorCode;
 import com.wei.apicommon.model.entity.InterfaceInfo;
 import com.wei.apicommon.service.InnerInterfaceInfoService;
-import com.wei.project.common.ErrorCode;
 import com.wei.project.exception.BusinessException;
 import com.wei.project.mapper.InterfaceInfoMapper;
 import org.apache.commons.lang3.StringUtils;
