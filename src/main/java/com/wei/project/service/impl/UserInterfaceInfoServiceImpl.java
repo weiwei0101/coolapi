@@ -57,10 +57,10 @@ public class UserInterfaceInfoServiceImpl extends ServiceImpl<UserInterfaceInfoM
 		queryWrapper.eq("interfaceInfoId", interfaceInfoId);
 		queryWrapper.eq("userId", userId);
 		UserInterfaceInfo userInterfaceInfo = this.getOne(queryWrapper);
-		if (userInterfaceInfo.getLeftNum() > 0){
-			return true;
+		if (userInterfaceInfo != null && userInterfaceInfo.getLeftNum() <= 0){
+			throw new BusinessException(ErrorCode.OPERATION_ERROR, "调用次数已用完！");
 		}else {
-			return false;
+			return true;
 		}
 	}
 

@@ -117,7 +117,6 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         // 查询该用户是否还有调用次数
         boolean hasLeftNum = innerUserInterfaceInfoService.hasLeftNum(interfaceInfo.getId(), invokeUser.getId());
         if(!hasLeftNum){
-            log.info("接口可调用次数不足！！！");
             return handleInvokeError(response);
         }
         // 5.请求转发，调用模拟接口 + 响应日志
