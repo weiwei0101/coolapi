@@ -1,6 +1,7 @@
 package com.wei.apigateway;
 
 import com.wei.apiclientsdk.util.SignUtil;
+import com.wei.apicommon.common.ErrorCode;
 import com.wei.apicommon.model.entity.InterfaceInfo;
 import com.wei.apicommon.model.entity.User;
 import com.wei.apicommon.service.InnerInterfaceInfoService;
@@ -49,14 +50,14 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
 
     private static final List<String> IP_WHITE_LIST = Arrays.asList("127.0.0.1");
 
-    private static final String INTERFACE_HOST = "http://localhost:8123";
+//    private static final String INTERFACE_HOST = "http://localhost:8123";
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         // 1.请求日志
         ServerHttpRequest request = exchange.getRequest();
-        String path = INTERFACE_HOST + request.getPath().value();
-//        String path = request.getPath().value();
+//        String path = INTERFACE_HOST + request.getPath().value();
+        String path = request.getPath().value();
         String method = request.getMethod().toString();
         log.info("请求唯一标识：" + request.getId());
         log.info("请求路径：" + path);
@@ -66,6 +67,7 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         log.info("请求来源地址：" + sourceAddress);
         log.info("请求来源地址：" + request.getRemoteAddress());
         ServerHttpResponse response = exchange.getResponse();
+
         // 2.访问控制 - 黑白名单
         if (!IP_WHITE_LIST.contains(sourceAddress)){
             response.setStatusCode(HttpStatus.FORBIDDEN);
@@ -88,6 +90,8 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         if (invokeUser == null){
             return handleNoAuth(response);
         }
+        // 判断随机数是否存在，防止重放攻击
+
         if (Long.parseLong(nonce) > 10000){
             return handleNoAuth(response);
         }
@@ -97,6 +101,7 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
 		if (currentTime - Long.parseLong(timestamp) >= FIVE_MINUTES){
             return handleNoAuth(response);
 		}
+        // 校验签名
         // 实际情况是从数据库中查出 secretKey
         String secretKey = invokeUser.getSecretKey();
         String serverSign = SignUtil.genSign(body, secretKey);
