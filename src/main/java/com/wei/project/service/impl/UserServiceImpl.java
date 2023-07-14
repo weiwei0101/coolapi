@@ -11,11 +11,15 @@ import com.wei.project.mapper.UserMapper;
 import com.wei.project.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.concurrent.TimeUnit;
 
 import static com.wei.apicommon.constant.UserConstant.ADMIN_ROLE;
 import static com.wei.apicommon.constant.UserConstant.USER_LOGIN_STATE;
@@ -33,6 +37,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     @Resource
     private UserMapper userMapper;
+    
+    @Resource
+    private RedisTemplate<Object,Object> redisTemplate;
 
     /**
      * 盐值，混淆密码
@@ -108,7 +115,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在或密码错误");
         }
         // 3. 记录用户的登录态
-        request.getSession().setAttribute(USER_LOGIN_STATE, user);
+        // request.getSession().setAttribute(USER_LOGIN_STATE, user);
+        String sessionId = request.getSession().getId();
+        // 将redis内存中的序列化的集合名称用String重新命名（增加可读性）
+        RedisSerializer rs = new StringRedisSerializer();
+        redisTemplate.setKeySerializer(rs);
+        redisTemplate.opsForValue().set(USER_LOGIN_STATE + "-" + sessionId, user, 600, TimeUnit.SECONDS);
         return user;
     }
 
@@ -121,17 +133,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     @Override
     public User getLoginUser(HttpServletRequest request) {
         // 先判断是否已登录
-        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        String sessionId = request.getSession().getId();
+        Object userObj = redisTemplate.opsForValue().get(USER_LOGIN_STATE + "-" + sessionId);
+//        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User currentUser = (User) userObj;
         if (currentUser == null || currentUser.getId() == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }
         // 从数据库查询（追求性能的话可以注释，直接走缓存）
-        long userId = currentUser.getId();
-        currentUser = this.getById(userId);
-        if (currentUser == null) {
-            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
-        }
+//        long userId = currentUser.getId();
+//        currentUser = this.getById(userId);
+//        if (currentUser == null) {
+//            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
+//        }
         return currentUser;
     }
 
@@ -156,11 +170,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      */
     @Override
     public boolean userLogout(HttpServletRequest request) {
-        if (request.getSession().getAttribute(USER_LOGIN_STATE) == null) {
+        String sessionId = request.getSession().getId();
+        if (redisTemplate.opsForValue().get(USER_LOGIN_STATE + sessionId) == null) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "未登录");
         }
         // 移除登录态
-        request.getSession().removeAttribute(USER_LOGIN_STATE);
+        //request.getSession().removeAttribute(USER_LOGIN_STATE);
+        redisTemplate.delete(USER_LOGIN_STATE + "-" + sessionId);
         return true;
     }
 
