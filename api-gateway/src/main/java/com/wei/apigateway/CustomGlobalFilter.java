@@ -1,7 +1,6 @@
 package com.wei.apigateway;
 
 import com.wei.apiclientsdk.util.SignUtil;
-import com.wei.apicommon.common.ErrorCode;
 import com.wei.apicommon.model.entity.InterfaceInfo;
 import com.wei.apicommon.model.entity.User;
 import com.wei.apicommon.service.InnerInterfaceInfoService;
@@ -18,7 +17,6 @@ import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.http.server.reactive.ServerHttpResponseDecorator;
@@ -50,20 +48,20 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
 
     private static final List<String> IP_WHITE_LIST = Arrays.asList("127.0.0.1");
 
-//    private static final String INTERFACE_HOST = "http://localhost:8123";
+    private static final String INTERFACE_HOST = "http://localhost:8123";
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         // 1.请求日志
         ServerHttpRequest request = exchange.getRequest();
-//        String path = INTERFACE_HOST + request.getPath().value();
-        String path = request.getPath().value();
+        String path = INTERFACE_HOST + request.getPath().value();
+//        String path = request.getPath().value();
         String method = request.getMethod().toString();
         log.info("请求唯一标识：" + request.getId());
         log.info("请求路径：" + path);
         log.info("请求方法：" + method);
         log.info("请求参数：" + request.getQueryParams());
-        String sourceAddress = request.getRemoteAddress().getHostString();
+        String sourceAddress = request.getLocalAddress().getHostString();
         log.info("请求来源地址：" + sourceAddress);
         log.info("请求来源地址：" + request.getRemoteAddress());
         ServerHttpResponse response = exchange.getResponse();
@@ -90,8 +88,6 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         if (invokeUser == null){
             return handleNoAuth(response);
         }
-        // 判断随机数是否存在，防止重放攻击
-
         if (Long.parseLong(nonce) > 10000){
             return handleNoAuth(response);
         }
@@ -118,7 +114,12 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         if (interfaceInfo == null){
             return handleNoAuth(response);
         }
-        // todo 是否还有调用次数
+        // 查询该用户是否还有调用次数
+        boolean hasLeftNum = innerUserInterfaceInfoService.hasLeftNum(interfaceInfo.getId(), invokeUser.getId());
+        if(!hasLeftNum){
+            log.info("接口可调用次数不足！！！");
+            return handleInvokeError(response);
+        }
         // 5.请求转发，调用模拟接口 + 响应日志
         // Mono<Void> filter = chain.filter(exchange);
         // return filter;

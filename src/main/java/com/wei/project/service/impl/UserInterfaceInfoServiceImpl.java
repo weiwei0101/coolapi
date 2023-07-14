@@ -1,5 +1,6 @@
 package com.wei.project.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wei.apicommon.common.ErrorCode;
@@ -44,6 +45,23 @@ public class UserInterfaceInfoServiceImpl extends ServiceImpl<UserInterfaceInfoM
 //		updateWrapper.gt("leftNum", 0);
 		updateWrapper.setSql("leftNum = leftNum - 1, totalNum = totalNum + 1");
 		return this.update(updateWrapper);
+	}
+
+	@Override
+	public boolean hasLeftNum(long interfaceInfoId, long userId) {
+		// 校验
+		if (interfaceInfoId <= 0 || userId <= 0){
+			throw new BusinessException(ErrorCode.PARAMS_ERROR);
+		}
+		QueryWrapper<UserInterfaceInfo> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("interfaceInfoId", interfaceInfoId);
+		queryWrapper.eq("userId", userId);
+		UserInterfaceInfo userInterfaceInfo = this.getOne(queryWrapper);
+		if (userInterfaceInfo.getLeftNum() > 0){
+			return true;
+		}else {
+			return false;
+		}
 	}
 
 }

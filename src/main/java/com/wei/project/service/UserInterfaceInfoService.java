@@ -9,6 +9,11 @@ import com.wei.apicommon.model.entity.UserInterfaceInfo;
  */
 public interface UserInterfaceInfoService extends IService<UserInterfaceInfo> {
 
+	/**
+	 * 用户接口信息校验
+	 * @param userInterfaceInfo
+	 * @param add
+	 */
 	void validUserInterfaceInfo(UserInterfaceInfo userInterfaceInfo, boolean add);
 
 	/**
@@ -18,4 +23,12 @@ public interface UserInterfaceInfoService extends IService<UserInterfaceInfo> {
 	 * @return
 	 */
 	boolean invokeCount(long interfaceInfoId, long userId);
+
+	/**
+	 * 查看用户对这个接口是否还有调用次数
+	 * @param interfaceInfoId
+	 * @param userId
+	 * @return
+	 */
+	boolean hasLeftNum(long interfaceInfoId, long userId);
 }

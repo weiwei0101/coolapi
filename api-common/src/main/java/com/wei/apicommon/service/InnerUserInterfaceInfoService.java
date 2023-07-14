@@ -13,4 +13,12 @@ public interface InnerUserInterfaceInfoService {
 	 * @return
 	 */
 	boolean invokeCount(long interfaceInfoId, long userId);
+
+	/**
+	 * 查看用户对这个接口是否还有调用次数
+	 * @param interfaceInfoId
+	 * @param userId
+	 * @return
+	 */
+	boolean hasLeftNum(long interfaceInfoId, long userId);
 }
